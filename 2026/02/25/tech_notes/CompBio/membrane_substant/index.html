@@ -1,0 +1,1287 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Standerd_icon.jpg">
+  <link rel="icon" href="/img/Standerd_icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="BHM-Bob G">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="膜模拟中的脂质组成：完整指南 技术博客 | 分子动力学模拟 | 生物膜建模By Tabbit(GLM5)最后更新：2026-03-03   目录 引言 脂质命名规则与缩写 细胞膜脂质组成的生物学基础 阿片受体的膜环境 常用模型膜组成 实验与模拟中的脂质选择 数据资源与工具 参考文献   引言脂质双分子层是细胞膜的基本结构单元，其组成直接影响膜蛋白的结构、动力学和功能。在分子动力学（MD）模拟中，选">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算生物学环境搭建">
+<meta property="og:url" content="https://bhm-bob.github.io/2026/02/25/tech_notes/CompBio/membrane_substant/index.html">
+<meta property="og:site_name" content="BHM-Bob G">
+<meta property="og:description" content="膜模拟中的脂质组成：完整指南 技术博客 | 分子动力学模拟 | 生物膜建模By Tabbit(GLM5)最后更新：2026-03-03   目录 引言 脂质命名规则与缩写 细胞膜脂质组成的生物学基础 阿片受体的膜环境 常用模型膜组成 实验与模拟中的脂质选择 数据资源与工具 参考文献   引言脂质双分子层是细胞膜的基本结构单元，其组成直接影响膜蛋白的结构、动力学和功能。在分子动力学（MD）模拟中，选">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-02-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-03-03T13:31:16.970Z">
+<meta property="article:author" content="BHM-Bob G">
+<meta property="article:tag" content="技术笔记">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>计算生物学环境搭建 - BHM-Bob G</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"bhm-bob.github.io","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":30,"cursorChar":"_","loop":false,"scope":["home"]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":"§"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BHM-Bob G</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">计算生物学环境搭建</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-02-25 00:00" pubdate>
+          2026年2月25日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          48 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">计算生物学环境搭建</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="膜模拟中的脂质组成：完整指南"><a href="#膜模拟中的脂质组成：完整指南" class="headerlink" title="膜模拟中的脂质组成：完整指南"></a>膜模拟中的脂质组成：完整指南</h1><blockquote>
+<p><strong>技术博客</strong> | 分子动力学模拟 | 生物膜建模<br>By Tabbit(GLM5)<br>最后更新：2026-03-03</p>
+</blockquote>
+<hr>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ol>
+<li><a href="#%E5%BC%95%E8%A8%80">引言</a></li>
+<li><a href="#%E8%84%82%E8%B4%A8%E5%91%BD%E5%90%8D%E8%A7%84%E5%88%99%E4%B8%8E%E7%BC%A9%E5%86%99">脂质命名规则与缩写</a></li>
+<li><a href="#%E7%BB%86%E8%83%9E%E8%86%9C%E8%84%82%E8%B4%A8%E7%BB%84%E6%88%90%E7%9A%84%E7%94%9F%E7%89%A9%E5%AD%A6%E5%9F%BA%E7%A1%80">细胞膜脂质组成的生物学基础</a></li>
+<li><a href="#%E9%98%BF%E7%89%87%E5%8F%97%E4%BD%93%E7%9A%84%E8%86%9C%E7%8E%AF%E5%A2%83">阿片受体的膜环境</a></li>
+<li><a href="#%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9E%8B%E8%86%9C%E7%BB%84%E6%88%90">常用模型膜组成</a></li>
+<li><a href="#%E5%AE%9E%E9%AA%8C%E4%B8%8E%E6%A8%A1%E6%8B%9F%E4%B8%AD%E7%9A%84%E8%84%82%E8%B4%A8%E9%80%89%E6%8B%A9">实验与模拟中的脂质选择</a></li>
+<li><a href="#%E6%95%B0%E6%8D%AE%E8%B5%84%E6%BA%90%E4%B8%8E%E5%B7%A5%E5%85%B7">数据资源与工具</a></li>
+<li><a href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE">参考文献</a></li>
+</ol>
+<hr>
+<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>脂质双分子层是细胞膜的基本结构单元，其组成直接影响膜蛋白的结构、动力学和功能。在分子动力学（MD）模拟中，选择合适的脂质组成对于获得生物学相关结果至关重要。本博客系统梳理了脂质命名规则、不同生物膜的脂质组成特征，以及膜蛋白模拟中的脂质选择策略。</p>
+<p><strong>核心问题</strong>：</p>
+<ul>
+<li>如何解读脂质缩写（如POPC、POPE、POPS）？</li>
+<li>不同细胞器和组织的膜脂质组成有何差异？</li>
+<li>GPCR（如阿片受体）模拟应使用什么脂质组成？</li>
+<li>学术界和工业界的常用标准是什么？</li>
+</ul>
+<hr>
+<h2 id="脂质命名规则与缩写"><a href="#脂质命名规则与缩写" class="headerlink" title="脂质命名规则与缩写"></a>脂质命名规则与缩写</h2><h3 id="命名系统解析"><a href="#命名系统解析" class="headerlink" title="命名系统解析"></a>命名系统解析</h3><p>脂质的系统命名遵循<strong>酰基链-头基</strong>的组合规则。以最常见的甘油磷脂为例：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css"><span class="hljs-selector-attr">[sn-1酰基链]</span>-<span class="hljs-selector-attr">[sn-2酰基链]</span>-<span class="hljs-selector-attr">[头基类型]</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="酰基链前缀缩写"><a href="#酰基链前缀缩写" class="headerlink" title="酰基链前缀缩写"></a>酰基链前缀缩写</h3><table>
+<thead>
+<tr>
+<th>前缀</th>
+<th>全称</th>
+<th>碳链长度</th>
+<th>双键数</th>
+<th>结构式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>DL</strong></td>
+<td>Dilauroyl</td>
+<td>12:0</td>
+<td>0</td>
+<td>CH₃(CH₂)₁₀CO-</td>
+</tr>
+<tr>
+<td><strong>DM</strong></td>
+<td>Dimyristoyl</td>
+<td>14:0</td>
+<td>0</td>
+<td>CH₃(CH₂)₁₂CO-</td>
+</tr>
+<tr>
+<td><strong>DP</strong></td>
+<td>Dipalmitoyl</td>
+<td>16:0</td>
+<td>0</td>
+<td>CH₃(CH₂)₁₄CO-</td>
+</tr>
+<tr>
+<td><strong>PO</strong></td>
+<td>Palmitoyl-Oleoyl</td>
+<td>16:0-18:1</td>
+<td>1 (sn-2)</td>
+<td>混合链</td>
+</tr>
+<tr>
+<td><strong>DO</strong></td>
+<td>Dioleoyl</td>
+<td>18:1</td>
+<td>2</td>
+<td>CH₃(CH₂)₇CH&#x3D;CH(CH₂)₇CO-</td>
+</tr>
+<tr>
+<td><strong>DS</strong></td>
+<td>Distearoyl</td>
+<td>18:0</td>
+<td>0</td>
+<td>CH₃(CH₂)₁₆CO-</td>
+</tr>
+<tr>
+<td><strong>DA</strong></td>
+<td>Diarachidonoyl</td>
+<td>20:4</td>
+<td>8</td>
+<td>花生四烯酸链</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>命名约定</strong>：根据PACKMOL-Memgen文档，前两个字母表示sn-1和sn-2位置的酰基链。例如，<strong>POPC</strong>表示sn-1为棕榈酰（16:0），sn-2为油酰（18:1）的磷脂酰胆碱。</p>
+</blockquote>
+<h3 id="头基类型缩写"><a href="#头基类型缩写" class="headerlink" title="头基类型缩写"></a>头基类型缩写</h3><table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>化学结构</th>
+<th>电荷（pH 7）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>PC</strong></td>
+<td>Phosphatidylcholine</td>
+<td>-PO₄⁻-CH₂CH₂N⁺(CH₃)₃</td>
+<td>中性（两性离子）</td>
+</tr>
+<tr>
+<td><strong>PE</strong></td>
+<td>Phosphatidylethanolamine</td>
+<td>-PO₄⁻-CH₂CH₂NH₃⁺</td>
+<td>中性（两性离子）</td>
+</tr>
+<tr>
+<td><strong>PS</strong></td>
+<td>Phosphatidylserine</td>
+<td>-PO₄⁻-CH₂CH(NH₃⁺)COO⁻</td>
+<td>-1</td>
+</tr>
+<tr>
+<td><strong>PG</strong></td>
+<td>Phosphatidylglycerol</td>
+<td>-PO₄⁻-CH₂CH(OH)CH₂OH</td>
+<td>-1</td>
+</tr>
+<tr>
+<td><strong>PI</strong></td>
+<td>Phosphatidylinositol</td>
+<td>-PO₄⁻-肌醇环</td>
+<td>0 至 -4（磷酸化状态）</td>
+</tr>
+<tr>
+<td><strong>PA</strong></td>
+<td>Phosphatidic Acid</td>
+<td>-PO₄⁻-H</td>
+<td>-1 至 -2</td>
+</tr>
+<tr>
+<td><strong>SM</strong></td>
+<td>Sphingomyelin</td>
+<td>鞘氨醇-磷酸胆碱</td>
+<td>中性（两性离子）</td>
+</tr>
+<tr>
+<td><strong>CL</strong></td>
+<td>Cardiolipin</td>
+<td>双磷脂酰甘油</td>
+<td>-2</td>
+</tr>
+</tbody></table>
+<h3 id="完整脂质名称示例"><a href="#完整脂质名称示例" class="headerlink" title="完整脂质名称示例"></a>完整脂质名称示例</h3><table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>系统命名</th>
+<th>分子量（Da）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>POPC</strong></td>
+<td>1-palmitoyl-2-oleoyl-sn-glycero-3-phosphocholine</td>
+<td>760.1</td>
+</tr>
+<tr>
+<td><strong>DOPC</strong></td>
+<td>1,2-dioleoyl-sn-glycero-3-phosphocholine</td>
+<td>786.1</td>
+</tr>
+<tr>
+<td><strong>DPPC</strong></td>
+<td>1,2-dipalmitoyl-sn-glycero-3-phosphocholine</td>
+<td>734.0</td>
+</tr>
+<tr>
+<td><strong>POPE</strong></td>
+<td>1-palmitoyl-2-oleoyl-sn-glycero-3-phosphoethanolamine</td>
+<td>717.9</td>
+</tr>
+<tr>
+<td><strong>POPS</strong></td>
+<td>1-palmitoyl-2-oleoyl-sn-glycero-3-phosphoserine</td>
+<td>734.0</td>
+</tr>
+<tr>
+<td><strong>CHL1</strong></td>
+<td>Cholesterol</td>
+<td>386.7</td>
+</tr>
+<tr>
+<td><strong>PSM</strong></td>
+<td>N-palmitoyl sphingomyelin</td>
+<td>703.0</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="细胞膜脂质组成的生物学基础"><a href="#细胞膜脂质组成的生物学基础" class="headerlink" title="细胞膜脂质组成的生物学基础"></a>细胞膜脂质组成的生物学基础</h2><h3 id="质膜"><a href="#质膜" class="headerlink" title="质膜"></a>质膜</h3><p>哺乳动物细胞质膜是最常模拟的膜类型，其特征为<strong>高胆固醇含量</strong>和<strong>脂质不对称性</strong>。</p>
+<p><strong>典型哺乳动物质膜组成</strong>（基于脂质组学数据）：</p>
+<table>
+<thead>
+<tr>
+<th>脂质类别</th>
+<th>外小叶</th>
+<th>内小叶</th>
+<th>总量占比</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PC</td>
+<td>50-60%</td>
+<td>20-30%</td>
+<td>35-45%</td>
+</tr>
+<tr>
+<td>PE</td>
+<td>5-10%</td>
+<td>25-35%</td>
+<td>20-25%</td>
+</tr>
+<tr>
+<td>PS</td>
+<td>&lt;5%</td>
+<td>15-20%</td>
+<td>10-15%</td>
+</tr>
+<tr>
+<td>SM</td>
+<td>15-25%</td>
+<td>&lt;5%</td>
+<td>10-15%</td>
+</tr>
+<tr>
+<td>胆固醇</td>
+<td>30-40%</td>
+<td>20-30%</td>
+<td>25-35%</td>
+</tr>
+<tr>
+<td>PI&#x2F;PIP</td>
+<td>&lt;5%</td>
+<td>5-10%</td>
+<td>5-8%</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>关键特征</strong>：质膜富含胆固醇和鞘脂（SM），形成脂筏微区。PS主要位于内小叶，其外翻是细胞凋亡的标志。</p>
+</blockquote>
+<p><strong>数据来源</strong>：</p>
+<ul>
+<li>Ingólfsson et al., <em>JACS</em> 2014 - 质膜脂质组织的计算脂质组学研究</li>
+<li>van Meer et al., <em>Nat Rev Mol Cell Biol</em> 2008 - 膜脂质的位置与行为综述</li>
+</ul>
+<h3 id="内质网膜"><a href="#内质网膜" class="headerlink" title="内质网膜"></a>内质网膜</h3><p>内质网是脂质合成的主要场所，其组成与质膜显著不同：</p>
+<table>
+<thead>
+<tr>
+<th>特征</th>
+<th>内质网</th>
+<th>质膜</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>胆固醇</td>
+<td>低（&lt;10%）</td>
+<td>高（25-35%）</td>
+</tr>
+<tr>
+<td>PE:PC比例</td>
+<td>~1:1</td>
+<td>~1:2</td>
+</tr>
+<tr>
+<td>鞘脂</td>
+<td>极少</td>
+<td>丰富</td>
+</tr>
+<tr>
+<td>膜厚度</td>
+<td>~3.5 nm</td>
+<td>~4.5 nm</td>
+</tr>
+</tbody></table>
+<h3 id="线粒体膜"><a href="#线粒体膜" class="headerlink" title="线粒体膜"></a>线粒体膜</h3><p>线粒体膜具有独特的脂质特征：</p>
+<table>
+<thead>
+<tr>
+<th>脂质类型</th>
+<th>外膜</th>
+<th>内膜</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PC</td>
+<td>45-55%</td>
+<td>35-45%</td>
+</tr>
+<tr>
+<td>PE</td>
+<td>25-35%</td>
+<td>25-35%</td>
+</tr>
+<tr>
+<td><strong>心磷脂（CL）</strong></td>
+<td>&lt;5%</td>
+<td>15-25%</td>
+</tr>
+<tr>
+<td>胆固醇</td>
+<td>低</td>
+<td>极低</td>
+</tr>
+<tr>
+<td>PI</td>
+<td>5-10%</td>
+<td>5-10%</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>心磷脂的重要性</strong>：心磷脂（CL）是线粒体内膜的标志性脂质，对呼吸链超复合物的组装和功能至关重要。模拟线粒体膜蛋白时必须包含CL。</p>
+</blockquote>
+<h3 id="细菌膜"><a href="#细菌膜" class="headerlink" title="细菌膜"></a>细菌膜</h3><p>革兰氏阴性菌内膜的典型组成：</p>
+<table>
+<thead>
+<tr>
+<th>脂质</th>
+<th>比例</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PE</td>
+<td>70-80%</td>
+<td>主要成分</td>
+</tr>
+<tr>
+<td>PG</td>
+<td>20-25%</td>
+<td>带负电荷</td>
+</tr>
+<tr>
+<td>CL</td>
+<td>5-10%</td>
+<td>心磷脂</td>
+</tr>
+</tbody></table>
+<p><strong>常用模型</strong>：DOPE:DOPG &#x3D; 3:1 或 POPE:POPG &#x3D; 3:1</p>
+<hr>
+<h2 id="阿片受体的膜环境"><a href="#阿片受体的膜环境" class="headerlink" title="阿片受体的膜环境"></a>阿片受体的膜环境</h2><h3 id="μ-阿片受体（MOR）的脂质相互作用"><a href="#μ-阿片受体（MOR）的脂质相互作用" class="headerlink" title="μ-阿片受体（MOR）的脂质相互作用"></a>μ-阿片受体（MOR）的脂质相互作用</h3><p>μ-阿片受体是A类GPCR的代表性成员，其功能受膜脂质组成的显著影响。</p>
+<p><strong>关键研究发现</strong>（Marino et al., <em>PLoS Comput Biol</em> 2016）：</p>
+<ol>
+<li><strong>带负电荷脂质的作用</strong>：PIP₂、PIP₃和PA倾向于在受体激活时定位到TM6-TM7形成的裂隙处</li>
+<li><strong>鞘脂富集区</strong>：SM富集的高序脂质区域在特定TM螺旋附近产生长程吸引力</li>
+<li><strong>受体构象依赖性</strong>：脂质-受体相互作用强度依赖于受体构象（激活态vs失活态）</li>
+</ol>
+<h3 id="阿片受体模拟的推荐膜组成"><a href="#阿片受体模拟的推荐膜组成" class="headerlink" title="阿片受体模拟的推荐膜组成"></a>阿片受体模拟的推荐膜组成</h3><p>基于文献调研，以下是阿片受体MD模拟的推荐方案：</p>
+<h4 id="方案A：简化模型（适合方法学开发）"><a href="#方案A：简化模型（适合方法学开发）" class="headerlink" title="方案A：简化模型（适合方法学开发）"></a>方案A：简化模型（适合方法学开发）</h4><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">POPC</span> + <span class="hljs-number">10</span>-<span class="hljs-number">20</span>% 胆固醇<br></code></pre></td></tr></table></figure>
+<ul>
+<li><strong>优点</strong>：计算效率高，便于比较</li>
+<li><strong>缺点</strong>：缺乏生物学真实性</li>
+<li><strong>适用场景</strong>：力场测试、采样方法验证</li>
+<li><strong>文献</strong>：Gupta et al., <em>Biophys J</em> 2009</li>
+</ul>
+<h4 id="方案B：哺乳动物质膜模型（推荐）"><a href="#方案B：哺乳动物质膜模型（推荐）" class="headerlink" title="方案B：哺乳动物质膜模型（推荐）"></a>方案B：哺乳动物质膜模型（推荐）</h4><figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ada">POPC : <span class="hljs-type">POPE</span> : <span class="hljs-type">POPS</span> : <span class="hljs-type">CHL1</span> = <span class="hljs-number">45</span> : 25 : 10 : 20<br></code></pre></td></tr></table></figure>
+<ul>
+<li><strong>优点</strong>：接近真实质膜组成</li>
+<li><strong>缺点</strong>：计算成本较高</li>
+<li><strong>适用场景</strong>：大多数GPCR功能研究</li>
+<li><strong>文献</strong>：基于Ingólfsson et al. 2014的简化</li>
+</ul>
+<h4 id="方案C：复杂质膜模型（高保真）"><a href="#方案C：复杂质膜模型（高保真）" class="headerlink" title="方案C：复杂质膜模型（高保真）"></a>方案C：复杂质膜模型（高保真）</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">63组分混合膜（Martini粗粒化力场）<br></code></pre></td></tr></table></figure>
+<p>包含：</p>
+<ul>
+<li><p>带负电荷脂质：PI、PS、PA、PIP₁₋₃、神经节苷脂（GM）</p>
+</li>
+<li><p>两性离子脂质：PC、PE、SM</p>
+</li>
+<li><p>微量成分：DAG、CER、LPC</p>
+</li>
+<li><p><strong>优点</strong>：最高生物学真实性</p>
+</li>
+<li><p><strong>缺点</strong>：仅适用于粗粒化模拟，参数复杂</p>
+</li>
+<li><p><strong>适用场景</strong>：脂质特异性相互作用研究</p>
+</li>
+<li><p><strong>文献</strong>：<a target="_blank" rel="noopener" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5154498/">Marino et al., <em>PLoS Comput Biol</em> 2016</a></p>
+</li>
+</ul>
+<h3 id="不同阿片受体的脂质偏好"><a href="#不同阿片受体的脂质偏好" class="headerlink" title="不同阿片受体的脂质偏好"></a>不同阿片受体的脂质偏好</h3><table>
+<thead>
+<tr>
+<th>受体</th>
+<th>推荐膜组成</th>
+<th>特殊考虑</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>μ-OR (MOR)</strong></td>
+<td>POPC:POPE:POPS:CHL &#x3D; 45:25:10:20</td>
+<td>PIP₂可能调节激活</td>
+</tr>
+<tr>
+<td><strong>δ-OR (DOR)</strong></td>
+<td>POPC + 10% CHL</td>
+<td>二聚化研究常用</td>
+</tr>
+<tr>
+<td><strong>κ-OR (KOR)</strong></td>
+<td>类似MOR</td>
+<td>选择性脂质相互作用待研究</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="常用模型膜组成"><a href="#常用模型膜组成" class="headerlink" title="常用模型膜组成"></a>常用模型膜组成</h2><h3 id="学术界标准"><a href="#学术界标准" class="headerlink" title="学术界标准"></a>学术界标准</h3><table>
+<thead>
+<tr>
+<th>应用场景</th>
+<th>推荐组成</th>
+<th>文献支持</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>基础膜性质研究</strong></td>
+<td>纯POPC或DPPC</td>
+<td>NMRlipids项目</td>
+</tr>
+<tr>
+<td><strong>GPCR模拟</strong></td>
+<td>POPC:CHL &#x3D; 80:20</td>
+<td>多数GPCR MD研究</td>
+</tr>
+<tr>
+<td><strong>离子通道</strong></td>
+<td>POPE:POPG &#x3D; 3:1（细菌）；哺乳动物用POPC:POPS</td>
+<td>取决于来源</td>
+</tr>
+<tr>
+<td><strong>转运蛋白</strong></td>
+<td>质膜模型（见上）</td>
+<td>取决于亚细胞定位</td>
+</tr>
+<tr>
+<td><strong>相分离&#x2F;脂筏</strong></td>
+<td>DPPC:DOPC:CHL &#x3D; 1:1:1</td>
+<td>三元混合物</td>
+</tr>
+<tr>
+<td><strong>线粒体蛋白</strong></td>
+<td>POPC:POPE:TOCL &#x3D; 50:35:15</td>
+<td>包含心磷脂</td>
+</tr>
+</tbody></table>
+<h3 id="工业界应用"><a href="#工业界应用" class="headerlink" title="工业界应用"></a>工业界应用</h3><p>药物发现中的膜模拟通常采用简化模型以平衡计算成本：</p>
+<table>
+<thead>
+<tr>
+<th>公司&#x2F;项目</th>
+<th>常用组成</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Schrödinger</strong></td>
+<td>POPC + 20% CHL</td>
+<td>平衡真实性与效率</td>
+</tr>
+<tr>
+<td><strong>OpenMM基准</strong></td>
+<td>纯POPC</td>
+<td>标准化比较</td>
+</tr>
+<tr>
+<td><strong>CHARMM-GUI示例</strong></td>
+<td>多种预设</td>
+<td>用户可选择</td>
+</tr>
+</tbody></table>
+<h3 id="力场兼容性"><a href="#力场兼容性" class="headerlink" title="力场兼容性"></a>力场兼容性</h3><p>不同力场支持的脂质类型：</p>
+<table>
+<thead>
+<tr>
+<th>力场</th>
+<th>脂质覆盖</th>
+<th>AMBER兼容性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>CHARMM36</strong></td>
+<td>最全面（&gt;100种）</td>
+<td>需转换</td>
+</tr>
+<tr>
+<td><strong>Lipid21</strong></td>
+<td>中等（~40种）</td>
+<td>原生支持</td>
+</tr>
+<tr>
+<td><strong>Slipids</strong></td>
+<td>中等</td>
+<td>需转换</td>
+</tr>
+<tr>
+<td><strong>Martini 3</strong></td>
+<td>最全面（粗粒化）</td>
+<td>需反向映射</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>注意</strong>：根据CHARMM-GUI FAQ，Lipid21和Slipid力场仅支持部分脂质类型。使用前应查阅兼容性表。</p>
+</blockquote>
+<hr>
+<h2 id="实验与模拟中的脂质选择"><a href="#实验与模拟中的脂质选择" class="headerlink" title="实验与模拟中的脂质选择"></a>实验与模拟中的脂质选择</h2><h3 id="选择原则"><a href="#选择原则" class="headerlink" title="选择原则"></a>选择原则</h3><ol>
+<li><strong>生物学相关性优先</strong>：根据蛋白的亚细胞定位选择膜组成</li>
+<li><strong>力场验证</strong>：使用经过实验验证的力场参数</li>
+<li><strong>计算可行性</strong>：平衡真实性与计算成本</li>
+<li><strong>可重复性</strong>：报告完整的脂质组成和比例</li>
+</ol>
+<h3 id="验证指标"><a href="#验证指标" class="headerlink" title="验证指标"></a>验证指标</h3><p>模拟完成后，应验证以下膜性质与实验数据的一致性：</p>
+<table>
+<thead>
+<tr>
+<th>性质</th>
+<th>实验方法</th>
+<th>典型值（POPC, 303K）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>面积&#x2F;脂质</td>
+<td>X射线&#x2F;中子散射</td>
+<td>67.4 ± 1.0 Å²</td>
+</tr>
+<tr>
+<td>膜厚度</td>
+<td>X射线散射</td>
+<td>3.8-4.2 nm</td>
+</tr>
+<tr>
+<td>NMR序参数</td>
+<td>²H-NMR</td>
+<td>SCD ≈ 0.17-0.22</td>
+</tr>
+<tr>
+<td>扩散系数</td>
+<td>FRAP&#x2F;NMR</td>
+<td>~5-10 μm²&#x2F;s</td>
+</tr>
+<tr>
+<td>弯曲模量</td>
+<td>微管吸吮</td>
+<td>10-40 kBT</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>参考</strong>：<a target="_blank" rel="noopener" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9534443/">Smith et al., <em>Living J Comput Mol Sci</em> 2019</a> - 膜模拟最佳实践指南</p>
+</blockquote>
+<h3 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h3><table>
+<thead>
+<tr>
+<th>错误</th>
+<th>后果</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>使用纯DPPC在310K</td>
+<td>膜处于凝胶相</td>
+<td>改用POPC或提高温度</td>
+</tr>
+<tr>
+<td>忽略脂质不对称性</td>
+<td>膜性质偏差</td>
+<td>使用CHARMM-GUI构建不对称膜</td>
+</tr>
+<tr>
+<td>胆固醇比例过高</td>
+<td>膜过度有序</td>
+<td>限制在20-35%</td>
+</tr>
+<tr>
+<td>缺少负电荷脂质</td>
+<td>膜蛋白定位错误</td>
+<td>添加10-15% PS&#x2F;PI</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="数据资源与工具"><a href="#数据资源与工具" class="headerlink" title="数据资源与工具"></a>数据资源与工具</h2><h3 id="脂质数据库"><a href="#脂质数据库" class="headerlink" title="脂质数据库"></a>脂质数据库</h3><table>
+<thead>
+<tr>
+<th>资源</th>
+<th>URL</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>LIPID MAPS</strong></td>
+<td><a target="_blank" rel="noopener" href="https://www.lipidmaps.org/">https://www.lipidmaps.org/</a></td>
+<td>&gt;49,000种脂质结构</td>
+</tr>
+<tr>
+<td><strong>CHARMM-GUI脂质库</strong></td>
+<td><a target="_blank" rel="noopener" href="https://charmm-gui.org/?doc=archive&amp;lib=lipid">https://charmm-gui.org/?doc=archive&amp;lib=lipid</a></td>
+<td>预平衡脂质结构</td>
+</tr>
+<tr>
+<td><strong>NMRlipids</strong></td>
+<td><a target="_blank" rel="noopener" href="https://nmrlipids.fi/">https://nmrlipids.fi/</a></td>
+<td>力场验证数据</td>
+</tr>
+<tr>
+<td><strong>LipidBook</strong></td>
+<td><a target="_blank" rel="noopener" href="https://lipidbook.bioch.ox.ac.uk/">https://lipidbook.bioch.ox.ac.uk</a></td>
+<td>膜模拟结构库</td>
+</tr>
+</tbody></table>
+<h3 id="膜构建工具"><a href="#膜构建工具" class="headerlink" title="膜构建工具"></a>膜构建工具</h3><table>
+<thead>
+<tr>
+<th>工具</th>
+<th>类型</th>
+<th>AMBER支持</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>CHARMM-GUI</strong></td>
+<td>Web</td>
+<td>是（需转换）</td>
+<td>最全面，支持&gt;180种脂质</td>
+</tr>
+<tr>
+<td><strong>PACKMOL-Memgen</strong></td>
+<td>命令行</td>
+<td>原生</td>
+<td>AmberTools内置，适合批量</td>
+</tr>
+<tr>
+<td><strong>insane</strong></td>
+<td>命令行</td>
+<td>间接</td>
+<td>Martini粗粒化专用</td>
+</tr>
+<tr>
+<td><strong>VMD Membrane</strong></td>
+<td>GUI</td>
+<td>间接</td>
+<td>可视化友好</td>
+</tr>
+</tbody></table>
+<h3 id="PACKMOL-Memgen命令示例"><a href="#PACKMOL-Memgen命令示例" class="headerlink" title="PACKMOL-Memgen命令示例"></a>PACKMOL-Memgen命令示例</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 构建阿片受体-膜复合物</span><br>packmol-memgen \<br>    --pdb mor_ligand.pdb \<br>    --lipids POPC:POPE:POPS:CHL1 \<br>    --ratio 45:25:10:20 \<br>    --salt --salt_con 0.15 \<br>    --dist 15 --dist_wat 17.5 \<br>    --parametrize<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><h3 id="脂质命名与力场"><a href="#脂质命名与力场" class="headerlink" title="脂质命名与力场"></a>脂质命名与力场</h3><ol>
+<li><p>Schott-Verdugo S, Gohlke H. PACKMOL-Memgen: A simple-to-use generalized workflow for membrane-protein&#x2F;lipid-bilayer system building. <em>J Chem Theory Comput</em>. 2019. <a target="_blank" rel="noopener" href="https://juser.fz-juelich.de/record/863299/files/PMMG_rev_final.pdf">PDF</a></p>
+</li>
+<li><p>Dickson CJ et al. Lipid14: The Amber Lipid Force Field. <em>J Chem Theory Comput</em>. 2014;10:865-879.</p>
+</li>
+<li><p>Lee J et al. CHARMM-GUI Membrane Builder for Complex Biological Membrane Simulations. <em>J Comput Chem</em>. 2019;35:1997-2004. <a target="_blank" rel="noopener" href="https://charmm-gui.org/?doc=archive&lib=lipid">CHARMM-GUI Lipid Archive</a></p>
+</li>
+</ol>
+<h3 id="膜脂质组学"><a href="#膜脂质组学" class="headerlink" title="膜脂质组学"></a>膜脂质组学</h3><ol start="4">
+<li><p>Ingólfsson HI et al. Lipid Organization of the Plasma Membrane. <em>J Am Chem Soc</em>. 2014;136:14554-14559.</p>
+</li>
+<li><p>van Meer G, Voelker DR, Feigenson GW. Membrane lipids: Where they are and how they behave. <em>Nat Rev Mol Cell Biol</em>. 2008;9:112-124.</p>
+</li>
+</ol>
+<h3 id="阿片受体膜模拟"><a href="#阿片受体膜模拟" class="headerlink" title="阿片受体膜模拟"></a>阿片受体膜模拟</h3><ol start="6">
+<li><p>Marino KA et al. Impact of Lipid Composition and Receptor Conformation on the Spatio-temporal Organization of μ-Opioid Receptors. <em>PLoS Comput Biol</em>. 2016;12:e1005240. <a target="_blank" rel="noopener" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5154498/">PMC5154498</a></p>
+</li>
+<li><p>Provasi D et al. Lessons from Free Energy Simulations of δ-Opioid Receptor Homodimers Involving the Fourth Transmembrane Helix. <em>Biochemistry</em>. 2010;49:7827-7839. <a target="_blank" rel="noopener" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2914489/">PMC2914489</a></p>
+</li>
+</ol>
+<h3 id="膜模拟最佳实践"><a href="#膜模拟最佳实践" class="headerlink" title="膜模拟最佳实践"></a>膜模拟最佳实践</h3><ol start="8">
+<li><p>Smith DJ et al. Simulation Best Practices for Lipid Membranes. <em>Living J Comput Mol Sci</em>. 2019;1:5966. <a target="_blank" rel="noopener" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9534443/">PMC9534443</a></p>
+</li>
+<li><p>Venable RM et al. Mechanical properties of lipid bilayers from molecular dynamics simulation. <em>Chem Phys Lipids</em>. 2015;192:60-74.</p>
+</li>
+</ol>
+<h3 id="CHARMM-GUI资源"><a href="#CHARMM-GUI资源" class="headerlink" title="CHARMM-GUI资源"></a>CHARMM-GUI资源</h3><ol start="10">
+<li><p>Jo S et al. CHARMM-GUI Membrane Builder for Mixed Bilayers. <em>Biophys J</em>. 2009;97:50-58.</p>
+</li>
+<li><p>Wu EL et al. CHARMM-GUI Membrane Builder toward realistic biological membrane simulations. <em>J Comput Chem</em>. 2014;35:1997-2004.</p>
+</li>
+</ol>
+<hr>
+<p><em>本博客基于2026年前发表的文献和权威教程编写。模拟参数应根据具体研究问题和计算资源进行调整。</em></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/">#技术笔记</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>计算生物学环境搭建</div>
+      <div>https://bhm-bob.github.io/2026/02/25/tech_notes/CompBio/membrane_substant/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>BHM-Bob G</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年2月25日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/02/25/tech_notes/CompBio/setup/" title="计算生物学环境搭建">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">计算生物学环境搭建</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/11/01/world_notes/20251101/" title="Happy Everyday!">
+                        <span class="hidden-mobile">Happy Everyday!</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/BHM-Bob" target="_blank"><span>github</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
