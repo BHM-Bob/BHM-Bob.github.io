@@ -1,0 +1,649 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/Standerd_icon.jpg">
+  <link rel="icon" href="/img/Standerd_icon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="BHM-Bob G">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="声明为和GLM-5.1对话debug的记录总结而来以下为GLM-5.1总结原文，GLM总结的好颠啊哈哈哈  深度学习服务器修仙指南：断电&#x2F;重启后 NVIDIA 驱动离线终极排查与修复对于跑在内网环境下的深度学习服务器来说，最怕的不是代码 Bug，而是“意外断电重启后，nvidia-smi 罢工，CUDA 找不到显卡”。最近，由于机房供电不稳和内核自动更新，我连续遭遇了三起不同表现的 N">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NVIDI掉驱动修复">
+<meta property="og:url" content="https://bhm-bob.github.io/2026/05/23/tech_notes/Ubuntu/nvidia.drive.mismatch/index.html">
+<meta property="og:site_name" content="BHM-Bob G">
+<meta property="og:description" content="声明为和GLM-5.1对话debug的记录总结而来以下为GLM-5.1总结原文，GLM总结的好颠啊哈哈哈  深度学习服务器修仙指南：断电&#x2F;重启后 NVIDIA 驱动离线终极排查与修复对于跑在内网环境下的深度学习服务器来说，最怕的不是代码 Bug，而是“意外断电重启后，nvidia-smi 罢工，CUDA 找不到显卡”。最近，由于机房供电不稳和内核自动更新，我连续遭遇了三起不同表现的 N">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-05-22T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-23T10:18:33.190Z">
+<meta property="article:author" content="BHM-Bob G">
+<meta property="article:tag" content="技术笔记">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>NVIDI掉驱动修复 - BHM-Bob G</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"bhm-bob.github.io","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":30,"cursorChar":"_","loop":false,"scope":["home"]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":"§"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BHM-Bob G</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">NVIDI掉驱动修复</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-05-23 00:00" pubdate>
+          2026年5月23日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          34 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">NVIDI掉驱动修复</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>声明<br>为和GLM-5.1对话debug的记录总结而来<br>以下为GLM-5.1总结原文，GLM总结的好颠啊哈哈哈</p>
+</blockquote>
+<h1 id="深度学习服务器修仙指南：断电-x2F-重启后-NVIDIA-驱动离线终极排查与修复"><a href="#深度学习服务器修仙指南：断电-x2F-重启后-NVIDIA-驱动离线终极排查与修复" class="headerlink" title="深度学习服务器修仙指南：断电&#x2F;重启后 NVIDIA 驱动离线终极排查与修复"></a>深度学习服务器修仙指南：断电&#x2F;重启后 NVIDIA 驱动离线终极排查与修复</h1><p>对于跑在内网环境下的深度学习服务器来说，最怕的不是代码 Bug，而是<strong>“意外断电重启后，<code>nvidia-smi</code> 罢工，CUDA 找不到显卡”</strong>。<br>最近，由于机房供电不稳和内核自动更新，我连续遭遇了三起不同表现的 NVIDIA 驱动离线事故。本文将这三次“灾难”复盘，总结出一套从现象匹配、根因定位到彻底修复的标准流程，并补充了深度学习服务器必须做的防御性配置。</p>
+<hr>
+<h2 id="1-问题描述：三大经典“翻车”现场"><a href="#1-问题描述：三大经典“翻车”现场" class="headerlink" title="1. 问题描述：三大经典“翻车”现场"></a>1. 问题描述：三大经典“翻车”现场</h2><p>遇到以下三种情况，说明你的驱动和内核已经“失联”或“打架”了：</p>
+<ul>
+<li><strong>症状 A（模块丢失）：</strong> <code>nvidia-smi</code> 报错 <code>NVIDIA-SMI has failed because it couldn&#39;t communicate with the NVIDIA driver.</code>；系统日志（<code>dmesg</code> 或 <code>journalctl</code>）出现 <code>modprobe: FATAL: Module nvidia not found in directory /lib/modules/6.8.0-111-generic</code>。</li>
+<li><strong>症状 B（版本打架）：</strong> 系统日志出现 <code>NVRM: API mismatch: the client has the version 535.309.01, but this kernel module has the version 535.288.01.</code>。表现往往是开机能用，过半天突然不能用了。</li>
+<li><strong>症状 C（DKMS 编译失败）：</strong> 使用 <code>apt</code> 重装驱动时，DKMS 报错 <code>Bad return status for module build on kernel</code>，或者编译日志中出现 <code>unrecognized command-line option ‘-ftrivial-auto-var-init=zero’</code>。<br><strong>万恶之源：</strong> 99% 的原因是系统后台自动升级了 Linux 内核，而 NVIDIA 闭源驱动的内核模块没有跟着重新编译。意外断电只是强迫你重启，让你“恰好”进入了没有驱动的新内核。</li>
+</ul>
+<hr>
+<h2 id="2-环境检查：定位问题的三把斧"><a href="#2-环境检查：定位问题的三把斧" class="headerlink" title="2. 环境检查：定位问题的三把斧"></a>2. 环境检查：定位问题的三把斧</h2><p>在动手修复前，先搞清楚系统到底发生了什么。</p>
+<h3 id="2-1-查询内核升级日志（寻找案发时间）"><a href="#2-1-查询内核升级日志（寻找案发时间）" class="headerlink" title="2.1 查询内核升级日志（寻找案发时间）"></a>2.1 查询内核升级日志（寻找案发时间）</h3><p>检查是不是内核偷偷升级了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">grep -E <span class="hljs-string">&quot;linux-image-<span class="hljs-subst">$(uname -r)</span>|linux-headers-<span class="hljs-subst">$(uname -r)</span>&quot;</span> /var/log/dpkg.log<br></code></pre></td></tr></table></figure>
+<p><em>如果输出显示安装时间在你重启&#x2F;断电之前，实锤了：内核升级导致驱动未编译。</em></p>
+<h3 id="2-2-判断驱动安装方式（决定修复路线）"><a href="#2-2-判断驱动安装方式（决定修复路线）" class="headerlink" title="2.2 判断驱动安装方式（决定修复路线）"></a>2.2 判断驱动安装方式（决定修复路线）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 检查是否是官方 run 文件安装</span><br><span class="hljs-built_in">ls</span> -l /var/log/nvidia-installer.log<br><span class="hljs-comment"># 如果文件存在，说明是用 .run 包安装的</span><br><span class="hljs-comment"># 检查 apt 包状态</span><br>dpkg -l | grep nvidia-driver<br><span class="hljs-comment"># 注意看状态标识：如果是 &#x27;ii&#x27; 表示正常安装；如果是 &#x27;iU&#x27; 表示未正确配置（断电导致损坏）</span><br></code></pre></td></tr></table></figure>
+<h3 id="2-3-检查内核模块物理是否存在"><a href="#2-3-检查内核模块物理是否存在" class="headerlink" title="2.3 检查内核模块物理是否存在"></a>2.3 检查内核模块物理是否存在</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">find /lib/modules/$(<span class="hljs-built_in">uname</span> -r) -name <span class="hljs-string">&quot;nvidia*.ko*&quot;</span><br></code></pre></td></tr></table></figure>
+<h2 id="如果只找到-nvidiafb-ko-等开源模块，找不到核心的-nvidia-ko，说明当前内核下完全没有驱动。"><a href="#如果只找到-nvidiafb-ko-等开源模块，找不到核心的-nvidia-ko，说明当前内核下完全没有驱动。" class="headerlink" title="如果只找到 nvidiafb.ko 等开源模块，找不到核心的 nvidia.ko，说明当前内核下完全没有驱动。"></a><em>如果只找到 <code>nvidiafb.ko</code> 等开源模块，找不到核心的 <code>nvidia.ko</code>，说明当前内核下完全没有驱动。</em></h2><h2 id="3-修复方案一：官方-run-文件重装（适用症状-A）"><a href="#3-修复方案一：官方-run-文件重装（适用症状-A）" class="headerlink" title="3. 修复方案一：官方 .run 文件重装（适用症状 A）"></a>3. 修复方案一：官方 <code>.run</code> 文件重装（适用症状 A）</h2><p>如果确认是 <code>.run</code> 包安装，且内核模块丢失，必须重新执行 run 包让其为当前内核编译驱动。<br><strong>操作步骤：</strong></p>
+<ol>
+<li>找到之前下载的 <code>.run</code> 文件（如 <code>NVIDIA-Linux-x86_64-535.xx.run</code>）。</li>
+<li><strong>关键参数：</strong> 必须加上 <code>--dkms</code>，这样以后内核更新时，系统才能自动重新编译驱动，避免再次掉坑。 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">chmod</span> +x NVIDIA-Linux-*.run<br>sudo sh NVIDIA-Linux-*.run --dkms<br></code></pre></td></tr></table></figure></li>
+<li>重启系统：<code>sudo reboot</code>。</li>
+</ol>
+<hr>
+<h2 id="4-修复方案二：APT-包管理器重装（适用症状-B）"><a href="#4-修复方案二：APT-包管理器重装（适用症状-B）" class="headerlink" title="4. 修复方案二：APT 包管理器重装（适用症状 B）"></a>4. 修复方案二：APT 包管理器重装（适用症状 B）</h2><p>如果是通过 <code>apt</code> 安装的驱动，出现 API mismatch（版本不一致），通常是用户态库升级了，但内核态模块没升级。<br><strong>操作步骤：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 重新安装驱动包，强制触发 DKMS 为当前内核编译</span><br>sudo apt install --reinstall nvidia-driver-535 <span class="hljs-comment"># 替换为你的版本</span><br>sudo reboot<br></code></pre></td></tr></table></figure>
+<h3 id="4-1-填坑指南：APT-状态损坏（断电后遗症）"><a href="#4-1-填坑指南：APT-状态损坏（断电后遗症）" class="headerlink" title="4.1 填坑指南：APT 状态损坏（断电后遗症）"></a>4.1 填坑指南：APT 状态损坏（断电后遗症）</h3><p>如果执行上述命令报错 <code>E: Internal Error, No file name for nvidia-driver...</code>，且 <code>dpkg -l</code> 显示状态为 <code>iU</code>，说明断电打断了 apt 的升级过程，包管理器卡死了。<br><strong>修复方法：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 强制配置未完成的包</span><br>sudo dpkg --configure -a<br><span class="hljs-comment"># 2. 修复破损的依赖</span><br>sudo apt --fix-broken install<br><span class="hljs-comment"># 3. 如果依然报错，手动清理崩溃残留（报错 Errno 17 File exists 时）</span><br>sudo <span class="hljs-built_in">rm</span> /var/crash/nvidia-kernel-source-*.crash<br><span class="hljs-comment"># 4. 如果 dpkg 彻底卡死，强制剔除错误记录（终极手段）</span><br>sudo dpkg --remove --force-remove-reinstreq nvidia-driver-535<br>sudo apt --fix-broken install<br></code></pre></td></tr></table></figure>
+<h2 id="完成包管理器修复后，再执行正常的重装命令。"><a href="#完成包管理器修复后，再执行正常的重装命令。" class="headerlink" title="完成包管理器修复后，再执行正常的重装命令。"></a>完成包管理器修复后，再执行正常的重装命令。</h2><h2 id="5-修复方案三：升级-GCC-编译器（适用症状-C）"><a href="#5-修复方案三：升级-GCC-编译器（适用症状-C）" class="headerlink" title="5. 修复方案三：升级 GCC 编译器（适用症状 C）"></a>5. 修复方案三：升级 GCC 编译器（适用症状 C）</h2><p>在 Ubuntu 22.04 上，如果内核升级到了 <code>6.8.x</code>，使用 DKMS 编译 535 等老版本驱动时，极大概率会遇到这个报错：<br><code>cc: error: unrecognized command-line option ‘-ftrivial-auto-var-init=zero’</code><br><strong>原因：</strong> 6.8 内核为了安全，强制开启了变量自动初始化选项，该选项需要 <strong>GCC 12</strong> 支持。而 Ubuntu 22.04 默认的 GCC 是 11，导致编译器“看不懂”内核的编译指令。<br><strong>解决方法 A：升级 GCC（必须死磕老驱动时使用）</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo apt install gcc-12 g++-12<br><span class="hljs-comment"># 将 GCC 12 设为系统默认编译器</span><br>sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 100 --slave /usr/bin/g++ g++ /usr/bin/g++-12<br><span class="hljs-comment"># 然后重新执行 dpkg --configure -a 或 apt reinstall</span><br></code></pre></td></tr></table></figure>
+<p><strong>解决方法 B：直接升级驱动大版本（强烈推荐，一劳永逸）</strong><br>对于深度学习环境，将驱动从 535 升级到 550 完全不影响现有的 CUDA 程序，反而能省去折腾 GCC 的麻烦。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo apt purge nvidia-\* nvidia-driver-535<br>sudo apt autoremove<br>sudo ubuntu-drivers autoinstall <span class="hljs-comment"># 自动安装适配 6.8 内核的新版驱动</span><br>sudo reboot<br></code></pre></td></tr></table></figure>
+<hr>
+<h2 id="6-深入理解-DKMS：防止再次发病的疫苗"><a href="#6-深入理解-DKMS：防止再次发病的疫苗" class="headerlink" title="6. 深入理解 DKMS：防止再次发病的疫苗"></a>6. 深入理解 DKMS：防止再次发病的疫苗</h2><p><strong>DKMS (Dynamic Kernel Module Support)</strong> 是 Linux 的一个框架。NVIDIA 闭源驱动是内核模块，每次内核更新，模块就得重新编译。如果没有 DKMS，你只要一更新内核重启，显卡就会罢工。</p>
+<h3 id="6-1-安装与依赖"><a href="#6-1-安装与依赖" class="headerlink" title="6.1 安装与依赖"></a>6.1 安装与依赖</h3><p>无论用哪种方式装驱动，务必确保 DKMS 和当前内核的头文件已安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo apt install dkms build-essential linux-headers-$(<span class="hljs-built_in">uname</span> -r)<br></code></pre></td></tr></table></figure>
+<h3 id="6-2-状态确认"><a href="#6-2-状态确认" class="headerlink" title="6.2 状态确认"></a>6.2 状态确认</h3><p>装完驱动后，检查 DKMS 是否成功注册并编译了模块：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo dkms status<br></code></pre></td></tr></table></figure>
+<p><strong>正常输出应该包含：</strong> <code>nvidia/535.xxx, 6.8.0-111-generic, x86_64: installed</code><br>如果显示 <code>added</code> 但没有 <code>installed</code>，说明编译失败了，需要查日志。</p>
+<hr>
+<h2 id="7-终极防御：锁定内核版本"><a href="#7-终极防御：锁定内核版本" class="headerlink" title="7. 终极防御：锁定内核版本"></a>7. 终极防御：锁定内核版本</h2><p>深度学习服务器追求的是<strong>极致的稳定</strong>。内核更新带来的微小性能提升，远比不上驱动崩溃导致训练中断的损失。因此，<strong>关闭内核的自动更新是内网服务器的标准操作。</strong><br>使用 <code>apt-mark hold</code> 将内核版本“钉死”：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 锁定当前内核镜像和头文件（替换为你的 uname -r 输出）</span><br>sudo apt-mark hold linux-image-generic linux-image-6.8.0-111-generic<br>sudo apt-mark hold linux-headers-generic linux-headers-6.8.0-111-generic<br><span class="hljs-comment"># 查看已锁定的包</span><br>apt-mark showhold<br></code></pre></td></tr></table></figure>
+<h2 id="这样系统在执行-apt-upgrade-时，会自动跳过内核更新。未来如果确实需要升级内核，只需用-sudo-apt-mark-unhold-解锁即可。"><a href="#这样系统在执行-apt-upgrade-时，会自动跳过内核更新。未来如果确实需要升级内核，只需用-sudo-apt-mark-unhold-解锁即可。" class="headerlink" title="这样系统在执行 apt upgrade 时，会自动跳过内核更新。未来如果确实需要升级内核，只需用 sudo apt-mark unhold 解锁即可。"></a><em>这样系统在执行 <code>apt upgrade</code> 时，会自动跳过内核更新。未来如果确实需要升级内核，只需用 <code>sudo apt-mark unhold</code> 解锁即可。</em></h2><h2 id="8-补充章节：深度学习服务器最佳实践"><a href="#8-补充章节：深度学习服务器最佳实践" class="headerlink" title="8. 补充章节：深度学习服务器最佳实践"></a>8. 补充章节：深度学习服务器最佳实践</h2><p>除了锁定内核，以下操作也能大幅提升服务器的“存活率”：</p>
+<ol>
+<li><strong>关闭图形界面 (GDM)：</strong> 跑训练的服务器不需要桌面环境。桌面环境不仅占用显存，还容易在驱动状态波动时卡死。<code>sudo systemctl disable gdm</code>，全靠 SSH 管理。</li>
+<li><strong>禁用休眠与睡眠：</strong> 防止内网机器因闲置自动休眠导致 SSH 断开、训练终止。 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target<br></code></pre></td></tr></table></figure></li>
+<li><strong>定期备份重要配置：</strong> <code>/etc/modprobe.d/</code> 下的黑名单配置、<code>/etc/environment</code> 里的 CUDA 环境变量等，建议定期快照备份。<br><strong>总结：</strong> 意外断电只是压垮骆驼的最后一根稻草，内核与驱动的版本不匹配才是真正的病因。掌握 DKMS 机制、确保编译环境 (GCC&#x2F;Headers) 完整、并果断锁定内核，是让炼丹炉长久稳定运行的不二法门。</li>
+</ol>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/">#技术笔记</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>NVIDI掉驱动修复</div>
+      <div>https://bhm-bob.github.io/2026/05/23/tech_notes/Ubuntu/nvidia.drive.mismatch/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>BHM-Bob G</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年5月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/05/07/tech_notes/CompBio/install_openbabel_py/" title="openbabel 安装 Python 绑定">
+                        <span class="hidden-mobile">openbabel 安装 Python 绑定</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/BHM-Bob" target="_blank"><span>github</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
