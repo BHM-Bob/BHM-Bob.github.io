@@ -16,15 +16,15 @@
   <meta name="author" content="BHM-Bob G">
   <meta name="keywords" content="">
   
-    <meta name="description" content="声明为和GLM-5.1对话debug的记录总结而来以下为GLM-5.1总结原文，GLM总结的好颠啊哈哈哈  深度学习服务器修仙指南：断电&#x2F;重启后 NVIDIA 驱动离线终极排查与修复对于跑在内网环境下的深度学习服务器来说，最怕的不是代码 Bug，而是“意外断电重启后，nvidia-smi 罢工，CUDA 找不到显卡”。最近，由于机房供电不稳和内核自动更新，我连续遭遇了三起不同表现的 N">
+    <meta name="description" content="声明和GLM-5.1对话debug的记录总结而来以下为GLM-5.1总结原文，GLM总结的好颠啊哈哈哈  深度学习服务器修仙指南：断电&#x2F;重启后 NVIDIA 驱动离线终极排查与修复对于跑在内网环境下的深度学习服务器来说，最怕的不是代码 Bug，而是“意外断电重启后，nvidia-smi 罢工，CUDA 找不到显卡”。最近，由于机房供电不稳和内核自动更新，我连续遭遇了三起不同表现的 NV">
 <meta property="og:type" content="article">
 <meta property="og:title" content="NVIDI掉驱动修复">
-<meta property="og:url" content="https://bhm-bob.github.io/2026/05/23/tech_notes/Ubuntu/nvidia.drive.mismatch/index.html">
+<meta property="og:url" content="https://bhm-bob.github.io/2026/05/23/tech_notes/Ubuntu/nvidia.driver.mismatch/index.html">
 <meta property="og:site_name" content="BHM-Bob G">
-<meta property="og:description" content="声明为和GLM-5.1对话debug的记录总结而来以下为GLM-5.1总结原文，GLM总结的好颠啊哈哈哈  深度学习服务器修仙指南：断电&#x2F;重启后 NVIDIA 驱动离线终极排查与修复对于跑在内网环境下的深度学习服务器来说，最怕的不是代码 Bug，而是“意外断电重启后，nvidia-smi 罢工，CUDA 找不到显卡”。最近，由于机房供电不稳和内核自动更新，我连续遭遇了三起不同表现的 N">
+<meta property="og:description" content="声明和GLM-5.1对话debug的记录总结而来以下为GLM-5.1总结原文，GLM总结的好颠啊哈哈哈  深度学习服务器修仙指南：断电&#x2F;重启后 NVIDIA 驱动离线终极排查与修复对于跑在内网环境下的深度学习服务器来说，最怕的不是代码 Bug，而是“意外断电重启后，nvidia-smi 罢工，CUDA 找不到显卡”。最近，由于机房供电不稳和内核自动更新，我连续遭遇了三起不同表现的 NV">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-05-22T16:00:00.000Z">
-<meta property="article:modified_time" content="2026-05-23T10:18:33.190Z">
+<meta property="article:modified_time" content="2026-05-23T10:20:53.890Z">
 <meta property="article:author" content="BHM-Bob G">
 <meta property="article:tag" content="技术笔记">
 <meta name="twitter:card" content="summary_large_image">
@@ -274,7 +274,7 @@
               <div class="markdown-body">
                 
                 <blockquote>
-<p>声明<br>为和GLM-5.1对话debug的记录总结而来<br>以下为GLM-5.1总结原文，GLM总结的好颠啊哈哈哈</p>
+<p>声明<br>和GLM-5.1对话debug的记录总结而来<br>以下为GLM-5.1总结原文，GLM总结的好颠啊哈哈哈</p>
 </blockquote>
 <h1 id="深度学习服务器修仙指南：断电-x2F-重启后-NVIDIA-驱动离线终极排查与修复"><a href="#深度学习服务器修仙指南：断电-x2F-重启后-NVIDIA-驱动离线终极排查与修复" class="headerlink" title="深度学习服务器修仙指南：断电&#x2F;重启后 NVIDIA 驱动离线终极排查与修复"></a>深度学习服务器修仙指南：断电&#x2F;重启后 NVIDIA 驱动离线终极排查与修复</h1><p>对于跑在内网环境下的深度学习服务器来说，最怕的不是代码 Bug，而是<strong>“意外断电重启后，<code>nvidia-smi</code> 罢工，CUDA 找不到显卡”</strong>。<br>最近，由于机房供电不稳和内核自动更新，我连续遭遇了三起不同表现的 NVIDIA 驱动离线事故。本文将这三次“灾难”复盘，总结出一套从现象匹配、根因定位到彻底修复的标准流程，并补充了深度学习服务器必须做的防御性配置。</p>
 <hr>
@@ -347,7 +347,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>NVIDI掉驱动修复</div>
-      <div>https://bhm-bob.github.io/2026/05/23/tech_notes/Ubuntu/nvidia.drive.mismatch/</div>
+      <div>https://bhm-bob.github.io/2026/05/23/tech_notes/Ubuntu/nvidia.driver.mismatch/</div>
     </div>
     <div class="license-meta">
       
@@ -390,6 +390,12 @@
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2027/07/22/tech_notes/Ubuntu/nvidia.driver.update.side-effect/" title="NVIDI驱动升级附带问题">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">NVIDI驱动升级附带问题</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
